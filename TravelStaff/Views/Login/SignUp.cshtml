@@ -1,0 +1,74 @@
+﻿@using EntityLayer.Concrete
+@model CreateStaffDto
+@{
+	Layout = null;
+	var admins = ViewBag.Admins as List<Staff>;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>TravelStaff | Kaydol</title>
+			<link rel="stylesheet" href="~/css/style.css">
+	</head>
+	<body>
+		<div class="wrapper">
+			<h2>Hesap Oluştur</h2>
+					<form method="post" action="#">
+						<input type="text" asp-for="Name" placeholder="İsim" />
+						<span asp-validation-for="Name" class="text-danger"></span>
+
+						<input type="text" asp-for="Surname" placeholder="Soyisim" />
+						<span asp-validation-for="Surname" class="text-danger"></span>
+
+						<input type="text" asp-for="Username" placeholder="Kullanıcı Adı" />
+						<span asp-validation-for="Username" class="text-danger"></span>
+
+						<input type="email" asp-for="Mail" placeholder="Email" />
+						<span asp-validation-for="Mail" class="text-danger"></span>
+
+						<input type="password" asp-for="Password" placeholder="Şifre" />
+						<span asp-validation-for="Password" class="text-danger"></span>
+
+						<input type="password" asp-for="ConfirmPassword" placeholder="Şifre Tekrar" />
+						<span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+
+						<select class="form-control" name="AdminID">
+							<option value="">Yönetici Seçiniz</option>
+							@if (admins != null && admins.Any())
+							{
+								@foreach (var admin in admins)
+								{
+									<option value="@admin.Id">@admin.Name @admin.Surname</option>
+								}
+							}
+							else
+							{
+								<option value="">No Admins Available</option>
+							}
+						</select>
+						<span asp-validation-for="AdminID" class="text-danger"></span>
+
+						<label for="IsAdmin">
+							<input type="checkbox" asp-for="IsAdmin" id="IsAdmin" />
+							Yönetici Hesabı mı?
+						</label>
+						<span asp-validation-for="IsAdmin" class="text-danger"></span>
+				<div class="policy">
+					<input type="checkbox">
+					<h3>I accept all terms & condition</h3>
+				</div>
+				<div class="input-box button">
+							<input type="Submit" value="Kaydol">
+				</div>
+				<div class="text">
+					<h3>Zaten bir hesabın var mı? <a href="/Login/SignIn/">Giriş Yap</a></h3>
+				</div>
+			</form>
+		</div>
+
+	</body>
+</html>

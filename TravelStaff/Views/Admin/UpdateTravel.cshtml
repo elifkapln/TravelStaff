@@ -1,0 +1,60 @@
+﻿@using EntityLayer.Concrete
+@model AdminUpdateTravelDto
+@{
+    ViewData["Title"] = "UpdateTravel";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+	// var statuses = ViewBag.Statuses as List<Status>;
+	var staffs = ViewBag.Staffs as List<Staff>;
+
+}
+
+<div class="container-fluid">
+	<h4 class="page-title">Seyahat Güncelleme</h4>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Seyahat Bilgileri</div>
+				</div>
+				<div class="card-body">
+					<form method="post">
+						<input type="hidden" asp-for="TravelID" />
+						<select class="form-control" asp-for="StaffID">
+							<option value="">Personel Seçiniz</option>
+							@if (staffs != null && staffs.Any())
+							{
+								@foreach (var staff in staffs)
+								{
+									<option value="@staff.Id">@staff.Name @staff.Surname (@staff.UserName)</option>
+								}
+							}
+							else
+							{
+								<option value="">Mevcut Personel Bulunmuyor</option>
+							}
+						</select>
+						<br />
+
+						@* 2eylül burası kapatıldı: onaylandı reddedildi butonları eklenecek *@
+@* 						<select class="form-control" asp-for="StatusID">
+							<option value="">Durum Seçiniz</option>
+							@if (statuses != null && statuses.Any())
+							{
+								@foreach (var status in statuses)
+								{
+									<option value="@status.StatusID">@status.Information</option>
+								}
+							}
+							else
+							{
+								<option value="Mevcut Durum Bulunmuyor"></option>
+							}
+						</select>
+						<br /> *@
+						<button class="btn btn-outline-primary">Güncelle</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

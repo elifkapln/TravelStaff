@@ -1,0 +1,68 @@
+﻿@using EntityLayer.DTOs.TravelDTOs
+@model List<TravelListDto>
+@{
+	ViewData["Title"] = "TravelList";
+}
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<table id="travelTable" class="table table-bordered">
+				<thead>
+					<tr>
+						<th>City</th>
+						<th>Start Date</th>
+						<th>End Date</th>
+						<th>Create Date</th>
+						<th>Description</th>
+						<th>Active</th>
+						<th>Stay</th>
+						<th>Vehicle</th>
+
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<a class="btn btn-outline-secondary" href="https://localhost:7055/Admin/CreateTravel">Yeni Seyahat Girişi</a>
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+	$(document).ready(function () {
+		// Sayfa yüklendiğinde AJAX çağrısı
+		console.log('Document ready');
+		$.ajax({
+			url: 'https://localhost:7143/api/Travel/GetAll', // API endpoint
+			method: 'GET',
+			contentType: 'application/json',
+			success: function (data) {
+				console.log(data);
+				// Dönen JSON verilerini işleme
+				var rows = '';
+				data.forEach(function (travel) {
+					rows += '<tr>' +
+						'<td>' + travel.city + '</td>' +
+						'<td>' + travel.startDate + '</td>' +
+						'<td>' + travel.endDate + '</td>' +
+						'<td>' + travel.createDate + '</td>' +
+						'<td>' + travel.description + '</td>' +
+						'<td>' + travel.active + '</td>' +
+						'<td>' + travel.stay + '</td>' +
+						'<td>' + travel.vehicle + '</td>' +
+					'</tr>';
+				});
+				// Verileri tabloya ekleme
+				$('#travelTable tbody').html(rows);
+			},
+			error: function (xhr, status, error) {
+				console.log('Error: ' + error);
+			}
+		});
+
+	});
+</script>

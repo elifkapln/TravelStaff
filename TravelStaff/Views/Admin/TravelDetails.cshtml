@@ -1,0 +1,264 @@
+﻿@model List<AdminTravelListDto>
+@{
+    ViewData["Title"] = "TravelDetails";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+	#tempMessage {
+		transition: opacity 1s ease-out; /* Geçiş 1 saniyede tamamlanacak */
+	}
+
+	.fade-out {
+		opacity: 0; /* Görünmez yap */
+	}
+</style>
+
+<div class="container-fluid">
+	<h4 class="page-title">Personelin Seyahatleri</h4>
+	@if (TempData["Message"] != null)
+	{
+		<div id="tempMessage" class="alert alert-info">
+			@TempData["Message"]
+		</div>
+	}
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Seyahat Tablosu</div>
+				</div>
+				<div class="card-body">
+					@if (Model != null && Model.Any())
+					{
+
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Şehir</th>
+									<th>Başlangıç Tarihi</th>
+									<th>Bitiş Tarihi</th>
+									<th>Oluşturulma Tarihi</th>
+									<th>Açıklama</th>
+									<th>Konaklama</th>
+									<th>Araç</th>
+									<th>Personel</th>
+									<th>Durum</th>
+									<th>Aktif</th>
+									<th>Detaylar</th>
+									<th>Personeli Değiştir</th>
+									<th>İşlem Yap</th>
+								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model)
+								{
+									@* @if (item == null) continue;
+							*@
+									<tr>
+										<td>@item.TravelID</td>
+										<td>@item.City</td>
+										<td>@item.StartDate.ToString("dd.MMM.yyyy")</td>
+										<td>@item.EndDate.ToString("dd.MMM.yyyy")</td>
+										<td>@item.CreateDate.ToString("dd.MMM.yyyy")</td>
+										<td>@item.Description</td>
+										<td>@item.Stay</td>
+										<td>@item.Vehicle</td>
+										<td>@item.StaffName @item.StaffSurname (@item.StaffUsername)</td>
+										<td>@item.StatusInformation</td>
+										@{
+											if (item.Active == true)
+											{
+												<td><a href="/Admin/MakePassive/@item.TravelID" class="btn btn-outline-warning">Pasif Yap</a></td>
+											}
+											else
+											{
+												<td><a href="/Admin/MakeActive/@item.TravelID" class="btn btn-outline-info">Aktif Yap</a></td>
+											}
+										}
+										<td><a href="/Admin/DisplayTravel/@item.TravelID" class="btn btn-outline-secondary">Detaylar</a></td>
+
+										<td>
+											@if (item.StatusID == 1)
+											{
+												<a href="/Admin/UpdateTravel/@item.TravelID" class="btn btn-outline-primary">Güncelle</a>
+
+											}
+
+										</td>
+
+										
+											@if (item.StatusID == 1)
+											{
+											<td><a href="javascript:void(0);" class="btn btn-outline-success" onclick="showApproveModal('@item.TravelID')"><i class="la la-check"></i></a></td>
+											<td><button class="btn btn-outline-danger" title="Reddet" data-toggle="modal" data-target="#rejectModal" data-id="@item.TravelID"><i class="la la-close"></i></button></td>
+											}
+
+																			
+									</tr>
+								}
+							</tbody>
+						</table>
+					}
+					else
+					{
+						<div class="container mt-5">
+							<h6 style="color:crimson">Personelinizin herhangi bir seyahati bulunmamaktadır.</h6>
+						</div>
+
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Approve Confirmation Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" role="dialog" aria-labelledby="approveModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="approveModalLabel">Seyahati Onayla</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				Seyahati onaylamak istediğinizden emin misiniz?
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+				<button type="button" class="btn btn-success" id="confirmApprove">Evet</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+@* <script type="text/javascript">
+	let travelIdToApprove = 0;
+
+	function showApproveModal(travelId) {
+		travelIdToApprove = travelId;
+		$('#approveModal').modal('show');
+	}
+
+	document.getElementById("confirmApprove").addEventListener("click", function () {
+		window.location.href = '/Admin/ApproveTravel/' + travelIdToApprove;
+	});
+</script> *@
+
+<!-- Reject Confirmation Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="rejectModalLabel" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="rejectModalLabel">Seyahati Reddet</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<p>Seyahati reddetmek istediğinizden emin misiniz?</p>
+				<div class="form-group">
+					<label for="rejectionReason">Red Nedenini Giriniz:</label>
+					<textarea class="form-control" id="rejectionReason" rows="3" required></textarea>
+					<div id="rejectionReasonError" class="text-danger" style="display: none;">Red nedeni gereklidir.</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+				<button type="button" class="btn btn-danger" id="confirmReject">Evet</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script>
+	setTimeout(function () {
+		var tempMessage = document.getElementById('tempMessage');
+		if (tempMessage) {
+			tempMessage.classList.add('fade-out'); // Opaklığı sıfıra düşüren sınıfı ekle
+			setTimeout(function () {
+				tempMessage.style.display = 'none'; // 1 saniye sonra tamamen gizle
+			}, 1000); // 1 saniye sonra gizleme işlemini tamamla
+		}
+	}, 5000); // Mesaj 5 saniye boyunca görünsün
+</script>
+
+<script type="text/javascript">
+	let travelIdToApprove = 0;
+	let travelIdToReject = 0;
+
+	function showApproveModal(travelId) {
+		$.ajax({
+			url: '/Admin/GetTravelStatus/' + travelId,
+			method: 'GET',
+			success: function (statusId) {
+				if (statusId === 2 || statusId === 3) {
+					alert("Bu seyahat zaten onaylanmış veya reddedilmiştir.");
+				} else {
+					travelIdToApprove = travelId;
+					$('#approveModal').modal('show');
+				}
+			}
+		});
+	}
+
+	document.getElementById("confirmApprove").addEventListener("click", function () {
+		window.location.href = '/Admin/ApproveTravel/' + travelIdToApprove;
+	});
+
+	$(document).ready(function () {
+		$('#rejectModal').on('show.bs.modal', function (event) {
+			let button = $(event.relatedTarget);
+			travelIdToReject = button.data('id');
+		});
+
+		document.getElementById("confirmReject").addEventListener("click", function () {
+			let rejectionReason = document.getElementById("rejectionReason").value;
+			if (!rejectionReason.trim()) {
+				alert("Red nedeni gereklidir.");
+				return;
+			}
+
+			$.ajax({
+				url: '/Admin/GetTravelStatus/' + travelIdToReject,
+				method: 'GET',
+				success: function (statusId) {
+					if (statusId === 2 || statusId === 3) {
+						alert("Bu seyahat zaten onaylanmış veya reddedilmiştir.");
+					} else {
+						window.location.href = '/Admin/RejectTravel/' + travelIdToReject + '?rejectionReason=' + encodeURIComponent(rejectionReason);
+					}
+				}
+			});
+		});
+	});
+</script>
+
+@* <script type="text/javascript">
+	$(document).ready(function () {
+		let travelIdToReject = 0;
+
+		$('#rejectModal').on('show.bs.modal', function (event) {
+			let button = $(event.relatedTarget);
+			travelIdToReject = button.data('id'); //travelid'yi alır
+		});
+
+		document.getElementById("confirmReject").addEventListener("click", function () {
+			let rejectionReason = document.getElementById("rejectionReason").value; //reddetme nedenini alır
+			let errorElement = document.getElementById("rejectionReasonError");
+			if (!rejectionReason.trim()) {
+				// Show error message if rejection reason is empty
+				errorElement.style.display = "block";
+			} else {
+				// Hide error message and proceed with the request
+				errorElement.style.display = "none";
+				window.location.href = '/Admin/RejectTravel/' + travelIdToReject + '?rejectionReason=' + encodeURIComponent(rejectionReason);
+			}
+		});
+	});
+</script> *@
+@* ajaxsız çalışan kısım *@

@@ -1,0 +1,60 @@
+﻿@model StaffLoginDto
+@{
+	Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>TravelStaff | Giriş Yap</title>
+	<link rel="stylesheet" href="~/css/login.css">
+</head>
+<body>
+
+
+	<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTwgcERR63sgRYQxBd89ijLspmKLikH4Gbgjg&s" alt="OpuqoImage" style="width: auto;">
+
+	<h1 style="font-size: 61px; color:#04612c;">Personel Seyahat Sistemi</h1>
+	<br>
+	<div class="container" id="container">
+		<div class="form-container sign-in-container">
+			<form method="post" action="#">
+				<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+				<h1>Giriş Yap</h1>
+				<input type="text" asp-for=@Model.Username placeholder="Kullanıcı Adı" />
+				<span asp-validation-for="Username"></span>
+				<input type="password" asp-for=@Model.Password placeholder="Şifre" />
+				<span asp-validation-for="Password"></span>
+				<a href="#">Şifremi Unuttum?</a>
+				<button>Giriş yap</button>
+			</form>
+		</div>
+		<div class="overlay-container">
+			<div class="overlay">
+				<div class="overlay-panel overlay-right">
+					<h1>Selam, Ekip!</h1>
+					<p>Seyahat etmek için kişisel bilgilerini gir.</p>
+					<button class="ghost" id="signUp">Kaydol</button>
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<footer>
+		<p>
+			Created with <i class="fa fa-heart"></i> by
+			<a target="_blank" href="https://florin-pop.com">Opuqo</a>
+			???
+			<a target="_blank" href="#">here</a>.
+		</p>
+	</footer>
+	<script>
+		document.getElementById("signUp").addEventListener("click", function() {
+			window.location.href = "/Login/SignUp";
+		});
+	</script>
+</body>
+</html>

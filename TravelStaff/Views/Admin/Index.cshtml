@@ -1,0 +1,62 @@
+﻿@model List<StaffListDto>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+	<h4 class="page-title">Personellerim</h4>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Personel Tablosu</div>
+				</div>
+				<div class="card-body">
+					@if (Model != null && Model.Any())
+					{
+
+						<table class="table table-hover">
+							<thead>
+								<tr>
+									<th>#</th>
+									<th>Adı</th>
+									<th>Soyadı</th>
+									<th>Kullanıcı Adı</th>
+									<th>Eposta</th>
+									<th>Aktif</th>
+									<th>Admin</th>
+ 									<th>Seyahatler</th>
+ 								</tr>
+							</thead>
+							<tbody>
+								@foreach (var item in Model)
+								{
+									<tr>
+										<td>@item.Id</td>
+										<td>@item.Name</td>
+										<td>@item.Surname</td>
+										<td>@item.UserName</td>
+										<td>@item.Email</td>
+										<td>@item.Active</td>
+										<td>@item.IsAdmin</td>
+										<td><a href="/Admin/TravelDetails/@item.Id" class="btn btn-outline-info">İncele</a></td>
+ 									</tr>
+
+
+								}
+							</tbody>
+						</table>
+					}
+					else
+					{
+						<div class="container mt-5">
+							<h6 style="color:crimson">Herhangi bir personeliniz bulunmamaktadır.</h6>
+						</div>
+
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

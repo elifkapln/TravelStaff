@@ -1,0 +1,344 @@
+﻿@model TravelPlusMessageDto
+@{
+    ViewData["Title"] = "DisplayTravel";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .chat-box {
+        border: 1px solid #ccc;
+        padding: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+    }
+
+    .admin-message {
+        text-align: left;
+        padding: 10px;
+        background-color: #e9ecef;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+
+    .staff-message {
+        text-align: right;
+        padding: 10px;
+        background-color: #d4edda;
+        margin-bottom: 10px;
+        border-radius: 10px;
+    }
+</style>
+
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'>
+@* <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'> *@
+<link rel="stylesheet" href="~/material-messaging-app-concept/dist/style.css">
+
+<partial name="~/Views/PartialViews/Admin/TravelPartialView.cshtml" model="Model?.TravelDto" />
+
+<div id="messagePartial">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"></div>
+                    </div>
+                    <div class="card-body">
+                        @if (Model?.MessageDto != null && Model.MessageDto.Any())
+                        {
+                            <div class="chat-box">
+                                @foreach (var item in Model.MessageDto)
+                                {
+                                    @if (@ViewBag.FromAdmin)
+                                    {
+                                        <!-- Admin mesajları -->
+                                        <div class="admin-message">
+                                            <strong>Admin:</strong> @item.Content
+                                            <span class="text-muted" style="font-size:small;">@item.SendDate</span>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <!-- Staff mesajları -->
+                                        <div class="staff-message">
+                                            <strong>Staff:</strong> @item.Content
+                                            <span class="text-muted" style="font-size:small;">@item.SendDate</span>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="container mt-5">
+                                <h4 style="color:crimson">Herhangi bir mesajınız yok.</h4>
+                            </div>
+                        }
+
+                        <!-- Mesaj gönderme formu -->
+                        <form id="createMessageForm">
+                            <input placeholder="Mesaj giriniz..." type="text" id="messageContent" class="form-control" />
+                            <span asp-validation-for="@Model.CreateMessageDto.Content" class="text-danger"></span>
+                            <br />
+                            <button type="submit" class="btn btn-outline-primary">Gönder</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/material-messaging-app-concept/dist/script.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.9/signalr.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let isSender = false;
+
+        initializeFormSubmit();
+
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/messageHub")
+            .build();
+
+        connection.start().then(function () {
+            console.log("SignalR bağlantısı kuruldu.");
+        }).catch(function (err) {
+            console.error(err.toString());
+        });
+
+        //bağlantıyı yeniden başlatma
+        connection.onclose(async () => {
+            await startSignalRConnection();
+        });
+        async function startSignalRConnection() {
+            try {
+                await connection.start();
+                console.log("SignalR yeniden bağlandı.");
+            } catch (err) {
+                console.error("SignalR bağlantısı başarısız oldu:", err);
+                setTimeout(() => startSignalRConnection(), 5000);
+            }
+        }
+
+
+
+        function initializeFormSubmit() {
+            $('#createMessageForm').off('submit').on('submit', function (e) {
+                e.preventDefault(); // Sayfanın yeniden yüklenmesini önle
+                var content = $('#messageContent').val(); // Formdaki content verisini al
+                var travelId = '@ViewData["TravelID"]';
+
+                isSender = true;
+
+                $.ajax({
+                    url: '@Url.Action("DisplayTravel", "Admin")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        Content: content,
+                        TravelID: travelId
+                    }),
+                    success: function () {
+                        $('#createMessageForm')[0].reset();
+                        loadLatestMessage(travelId); // Mesajları yeniden yükle
+                        console.log("ajax post: mesajlar yüklendi")
+                        sendMessageToGroup(travelId); //receive messageyi tetikler
+                        console.log("ajax post: sendmessageden dönüldü")
+                    },
+                    error: function (xhr) {
+                        console.log("göderende Mesaj gönderme sırasında bir hata oluştu.");
+                    }
+                });
+            });
+        }
+
+        function sendMessageToGroup(travelId) {
+            connection.invoke("SendMessage", travelId).catch(function (err) {
+                console.error(err.toString());
+            });
+        }
+
+        connection.on("ReceiveMessage", async function (travelId) {
+            if (!isSender) {
+                try {
+                    await loadLatestMessage(travelId);
+                    console.log("receivemessage: loadmessageden dönüldü");
+                } catch (error) {
+                    console.log("ReceiveMessage: Mesajları alırken bir hata oluştu : ", error);
+                }
+            } else {
+                isSender = false;
+            }
+        });
+
+        async function loadLatestMessage(travelId) {
+            try {
+                // Sunucudan sadece yeni mesajı al
+                let latestMessage = await $.ajax({
+                    url: 'https://localhost:7143/api/message/getlatest/' + travelId,
+                    type: 'GET'
+                });
+
+                // Yeni mesajı tabloya ekle
+                addMessageToTable(latestMessage);
+            } catch (error) {
+                console.log("Yeni mesajı alırken bir hata oluştu:", error.responseText);
+            }
+        }
+
+        function addMessageToTable(message) {
+            let formattedDate = new Date(message.sendDate).toLocaleString('tr-TR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            // Yeni mesajı tabloya ekleyeceğiz
+            var newRow = `
+                    <tr>
+                        <td>${message.messageID}</td>
+                        <td>${message.content}</td>
+                        <td>${formattedDate}</td>
+                        <td>${message.fromAdmin}</td>
+                        <td>${message.active}</td>
+                        <td>${message.travelID}</td>
+                    </tr>
+                `;
+
+            // Mesajları içeren tabloya yeni satırı ekle
+            $('tbody').append(newRow);  // Tablonun sonuna ekliyoruz
+        }
+
+        // async function loadMessages(travelId) {
+        //     try {
+        //         $('#messagePartial').empty();
+        //         let data = await $.ajax({
+        //             url: '/Admin/DisplayTravel/' + travelId,
+        //             type: 'GET',
+        //         });
+        //         $('#messagePartial').html($(data).find('#messagePartial').html());
+        //         initializeFormSubmit();
+        //     } catch (error) {
+        //         console.log("Mesajları alırken bir hata oluştu:", error.responseText);
+        //     }
+        // }
+
+        //initializeFormSubmit()dan önceki hali
+        // $('#createMessageForm').submit( function (e) {
+        //     e.preventDefault(); // Prevent full page reload
+
+        //     var content = $('#messageContent').val();
+        //     var travelId = '@ViewData["TravelID"]';
+
+        //     $.ajax({
+        //         url: '/Admin/DisplayTravel/',
+        //         type: 'POST',
+        //         contentType: 'application/json',
+        //         data: JSON.stringify({
+        //             Content: content,
+        //             TravelID: travelId
+        //         }),
+        //         success: function () {
+        //             console.log("post başarılı");
+        //             $('#createMessageForm')[0].reset();
+        //             // sendMessageToGroup(travelId);
+        //             loadMessages(travelId);
+        //         },
+        //         error: function (xhr) {
+        //             console.log("Mesaj gönderme sırasında bir hata oluştu.");
+        //         }
+        //     });
+        // });
+
+
+        // connection.on("ReceiveMessage", function (travelId) {
+        //     setTimeout(function () {
+        //         loadMessages(travelId);
+        //     }, 500); //gecikme
+        // });
+
+
+
+        //async yapılmadan önceki hali
+        // function loadMessages(travelId) {
+        //     $('#messagePartial').empty();
+        //     $.ajax({
+        //         url: '/Admin/DisplayTravel/' + travelId,
+        //         type: 'GET',
+        //         success: function (data) {
+        //             $('#messagePartial').html($(data).find('#messagePartial').html());
+        //             initializeFormSubmit();
+        //         },
+        //         error: function (xhr) {
+        //             console.log("Mesajları alırken bir hata oluştu:", xhr.responseText);
+        //             alert("Mesajları alırken bir hata oluştu.");
+        //         }
+        //     });
+        // }
+
+
+    });
+</script>
+
+
+@* <div id="messagePartial">
+	<div class="container-fluid">
+		<h4 class="page-title">Mesajlar</h4>
+		<div class="row">
+			<div class="col-md-6">
+				<div class="card">
+					<div class="card-header">
+						<div class="card-title">Mesaj Tablosu</div>
+					</div>
+					<div class="card-body">
+						@if (Model?.MessageDto != null && Model.MessageDto.Any())
+						{
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th scope="col">#</th>
+										<th scope="col">İçerik</th>
+										<th scope="col">Gönderilme Zamanı</th>
+										<th scope="col">Adminden</th>
+										<th scope="col">Aktif</th>
+										<th scope="col">TravelID</th>
+									</tr>
+								</thead>
+								<tbody>
+									@foreach (var item in Model.MessageDto)
+									{
+										<tr>
+											<td>@item.MessageID</td>
+											<td>@item.Content</td>
+											<td>@item.SendDate</td>
+											<td>@item.FromAdmin</td>
+											<td>@item.Active</td>
+											<td>@item.TravelID</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+							<form id="createMessageForm">
+								<input placeholder="Mesaj giriniz..." type="text" id="messageContent" class="form-control" />
+								<span asp-validation-for="@Model.CreateMessageDto.Content" class="text-danger"></span>
+								<br />
+								<button type="submit" class="btn btn-outline-primary">Gönder</button>
+							</form>
+						}
+						else
+						{
+							<div class="container mt-5">
+								<h4 style="color:crimson">Herhangi bir mesajınız yok.</h4>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> *@

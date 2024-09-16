@@ -1,0 +1,77 @@
+﻿@* KULLANILMIYOR DİSPLAYTRAVEL VİEWA TAŞINDI
+
+
+@* @model CreateMessageDto
+@{
+	Layout = null;
+}
+
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-body">
+					<form id="createMessageForm">
+						<input placeholder="Mesaj giriniz..." type="text" asp-for="Content" class="form-control" />
+						<span asp-validation-for="Content" class="text-danger"></span>
+						<br />
+						<button type="submit" class="btn btn-outline-primary">Gönder</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+
+	$('#createMessageForm').submit(function (e) {
+		e.preventDefault(); // Prevent full page reload
+		console.log("test");
+		var travelId = '@ViewData["TravelID"]';
+
+		$.ajax({
+			url: '@Url.Action("DisplayTravel", "Admin")',
+			type: 'POST',
+			data: $(this).serialize(),
+			success: function (response) {
+				console.log(response);
+
+
+				if (response.success) {
+					// Update the message table with the new messages
+					loadMessages(travelId);
+					$('#createMessageForm')[0].reset(); // Clear the form after submission
+				} else {
+					alert("Mesaj gönderilemedi.");
+				}
+			},
+			error: function (xhr) {
+				alert("Mesaj gönderme sırasında bir hata oluştu.");
+			}
+		});
+	});
+
+	$(document).ready(function () {
+
+
+		// Function to dynamically update the message table
+		function loadMessages(travelId) {
+			var travelId = '@ViewData["TravelID"]';
+			$.ajax({
+				url: '/Admin/DisplayTravel/' + travelId,
+				type: 'GET',
+				success: function (data) {
+					// Find the part of the page that shows messages and update it
+					$('#messagePartial').html($(data).find('#messagePartial').html());
+				},
+				error: function (xhr) {
+					alert("Mesajları alırken bir hata oluştu.");
+				}
+			});
+		}
+	});
+</script>
+ *@

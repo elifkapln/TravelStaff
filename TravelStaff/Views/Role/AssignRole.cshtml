@@ -1,0 +1,39 @@
+﻿@model List<AssignRoleDto>
+@{
+    ViewData["Title"] = "AssignRole";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+	<h4 class="page-title">Rol Atama</h4>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Kullanıcı Rolleri</div>
+				</div>
+				<div class="card-body">
+                    @* Tüm roller checkbox olarak listelenecek.
+                    Kullanıcıya rol atama, ilgili checkbox'ın' işaretlenmesiyle gerçekleşecek. *@
+                    <form method="post">
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <div class="form-check">
+                                <input type="hidden" asp-for="@Model[i].Id" />
+                                <input type="hidden" asp-for="@Model[i].Name" />
+								<input type="checkbox" asp-for="@Model[i].Exist" class="form-check-input"/>
+								@* Kullanıcı ilgili role sahipse checkbox işaretli gelecek *@
+                                
+                                <label class="form-check-label" for="@Model[i].Exist">@Model[i].Name</label>
+                            </div>
+                        }
+                        <br />
+                        <button class="btn btn-outline-info">Kaydet</button>
+                    </form>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<a href="/Role/UserList/" class="btn btn-outline-warning">Kullanıcı Listesine Dön</a>

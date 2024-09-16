@@ -1,0 +1,66 @@
+﻿@model CreateTravelDto
+@{
+	ViewData["Title"] = "AddTravel";
+	Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+	<h4 class="page-title">Yeni Seyahat Oluşturma</h4>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Seyahat Bilgileri</div>
+				</div>
+				<div class="card-body">
+					<form method="post">
+						<label>Şehir</label>
+						<input type="text" asp-for="City" class="form-control" />
+						<span asp-validation-for="City" class="text-danger"></span>
+						<br />
+
+						<label>Başlangıç Tarihi</label>
+						<input type="date" asp-for="StartDate" class="form-control" />
+						<span asp-validation-for="StartDate" class="text-danger"></span>
+						<br />
+
+						<label>Bitiş Tarihi</label>
+						<input type="date" asp-for="EndDate" class="form-control" />
+						<span asp-validation-for="EndDate" class="text-danger"></span>
+						<br />
+
+						<label>Açıklama</label>
+						<input type="text" asp-for="Description" class="form-control" />
+						<span asp-validation-for="Description" class="text-danger"></span>
+						<br />
+
+						<label asp-for="Stay">Konaklama</label>
+						<select asp-for="Stay" class="form-control wide">
+							<option value="" disabled selected>Konaklama seçiniz</option>
+							<option value="Otel">Otel </option>
+							<option value="Kiralık daire">Kiralık daire </option>
+							<option value="Hostel">Hostel </option>
+							<option value="Pansiyon">Pansiyon </option>
+							<option value="Tatil köyü">Tatil köyü </option>
+						</select>
+						<span asp-validation-for="Stay" class="text-danger"></span>
+
+						<label asp-for="Vehicle">Araç</label>
+						<select asp-for="Vehicle" class="form-control wide">
+							<option value="" disabled selected>Araç seçiniz</option>
+							<option value="Uçak">Uçak </option>
+							<option value="Otobüs">Otobüs </option>
+							<option value="Özel araç">Özel araç </option>
+							<option value="Servis">Servis </option>
+							<option value="Tren">Tren </option>
+						</select>
+						<span asp-validation-for="Stay" class="text-danger"></span>
+						<br />
+
+						<button class="btn btn-outline-primary">Oluştur</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

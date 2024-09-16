@@ -1,0 +1,30 @@
+﻿@model StatusListDto
+@{
+    ViewData["Title"] = "UpdateStatus";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+	<h4 class="page-title">Durum Güncelleme</h4>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Durumu Güncelle</div>
+				</div>
+				<div class="card-body">
+					<form method="post">
+						<input type="hidden" asp-for="StatusID" />
+
+						<div class="form-group">
+							@Html.Label("Durum Bilgisi")
+							<input type="text" asp-for="Information" class="form-control" />
+						</div>
+						<br />
+						<button class="btn btn-outline-primary">Güncelle</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

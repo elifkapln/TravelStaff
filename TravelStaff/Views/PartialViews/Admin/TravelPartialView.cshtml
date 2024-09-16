@@ -1,0 +1,51 @@
+﻿@model AdminTravelListDto
+@{
+    Layout = null;
+}
+
+<div class="container-fluid">
+	<h4 class="page-title">Seyahat Detayları</h4>
+	<div class="row">
+		<div class="col-md-6">
+			<div class="card">
+				<div class="card-header">
+					<div class="card-title">Detaylar</div>
+				</div>
+				<div class="card-body">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th>#</th>
+								<th>Şehir</th>
+								<th>Başlangıç Tarihi</th>
+								<th>Bitiş Tarihi</th>
+								<th>Oluşturulma Tarihi</th>
+								<th>Açıklama</th>
+								<th>Konaklama</th>
+								<th>Araç</th>
+								<th>Personel</th>
+								<th>Durum</th>
+								<th>Aktif</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>@Model.TravelID</td>
+								<td>@Model.City</td>
+								<td>@Model.StartDate.ToString("dd.MMM.yyyy")</td>
+								<td>@Model.EndDate.ToString("dd.MMM.yyyy")</td>
+								<td>@Model.CreateDate.ToString("dd.MMM.yyyy")</td>
+								<td>@Model.Description</td>
+								<td>@Model.Stay</td>
+								<td>@Model.Vehicle</td>
+								<td>@Model.StaffName @Model.StaffSurname (@Model.StaffUsername)</td>
+								<td>@Model.StatusInformation</td>
+								<td>@Model.Active</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
