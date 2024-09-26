@@ -93,8 +93,9 @@ namespace TravelStaff.Controllers
 			HttpContext.Session.SetInt32("TravelID", id);
 			HttpContext.Session.SetInt32("UserID", userid);
 			ViewData["TravelID"] = id;
-            ViewBag.fromAdmin = _travelService.TIsAdminOfTravel(id, userid);
 
+			//kullanıcı admin mi?
+            ViewBag.UserIsAdmin = _travelService.TIsAdminOfTravel(id, userid);
 
             return View(travelPlusMessageDto);
 		}

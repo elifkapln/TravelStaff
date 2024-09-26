@@ -31,17 +31,17 @@ namespace DataAccessLayer.Concrete
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Staff>()
-           .HasMany(s => s.Travels)
-           .WithOne(t => t.Staff)
-           .HasForeignKey(t => t.StaffID)
-           .OnDelete(DeleteBehavior.NoAction);
+               .HasMany(s => s.Travels)
+               .WithOne(t => t.Staff)
+               .HasForeignKey(t => t.StaffID)
+               .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Staff>()
-            .HasOne(s => s.Admin)
-            .WithMany(a => a.Staffs)
-            .HasForeignKey(s => s.AdminID)
-            .IsRequired(false)
-            .OnDelete(DeleteBehavior.NoAction);
+                .HasOne(s => s.Admin)
+                .WithMany(a => a.Staffs)
+                .HasForeignKey(s => s.AdminID)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Travel>()
                 .HasOne(t => t.Admin)

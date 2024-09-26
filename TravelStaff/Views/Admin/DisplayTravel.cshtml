@@ -13,7 +13,7 @@
         background-color: #f9f9f9;
     }
 
-    .admin-message {
+    .receiver-message {
         text-align: left;
         padding: 10px;
         background-color: #e9ecef;
@@ -21,7 +21,7 @@
         border-radius: 10px;
     }
 
-    .staff-message {
+    .sender-message {
         text-align: right;
         padding: 10px;
         background-color: #d4edda;
@@ -50,21 +50,39 @@
                             <div class="chat-box">
                                 @foreach (var item in Model.MessageDto)
                                 {
-                                    @if (@ViewBag.FromAdmin)
+                                    if (@ViewBag.UserIsAdmin)
                                     {
-                                        <!-- Admin mesajları -->
-                                        <div class="admin-message">
-                                            <strong>Admin:</strong> @item.Content
-                                            <span class="text-muted" style="font-size:small;">@item.SendDate</span>
-                                        </div>
+                                        if (@item.FromAdmin)
+                                        {
+                                            <div class="sender-message">
+                                                <strong>Admin:</strong> @item.Content
+                                                <span class="text-muted" style="font-size:small;">@item.SendDate</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="receiver-message">
+                                                <strong>Staff:</strong> @item.Content
+                                                <span class="text-muted" style="font-size:small;">@item.SendDate</span>
+                                            </div>
+                                        }
                                     }
                                     else
                                     {
-                                        <!-- Staff mesajları -->
-                                        <div class="staff-message">
-                                            <strong>Staff:</strong> @item.Content
-                                            <span class="text-muted" style="font-size:small;">@item.SendDate</span>
-                                        </div>
+                                        if (@item.FromAdmin)
+                                        {
+                                            <div class="receiver-message">
+                                                <strong>Admin:</strong> @item.Content
+                                                <span class="text-muted" style="font-size:small;">@item.SendDate</span>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="sender-message">
+                                                <strong>Staff:</strong> @item.Content
+                                                <span class="text-muted" style="font-size:small;">@item.SendDate</span>
+                                            </div>
+                                        }
                                     }
                                 }
                             </div>
@@ -198,20 +216,33 @@
                 minute: '2-digit',
                 second: '2-digit'
             });
-            // Yeni mesajı tabloya ekleyeceğiz
-            var newRow = `
-                    <tr>
-                        <td>${message.messageID}</td>
-                        <td>${message.content}</td>
-                        <td>${formattedDate}</td>
-                        <td>${message.fromAdmin}</td>
-                        <td>${message.active}</td>
-                        <td>${message.travelID}</td>
-                    </tr>
-                `;
 
-            // Mesajları içeren tabloya yeni satırı ekle
-            $('tbody').append(newRow);  // Tablonun sonuna ekliyoruz
+            let messageAlignment = '';
+            let newMessageHtml = '';
+
+            if (@ViewBag.UserIsAdmin) {
+                if (message.fromAdmin) {
+                    messageAlignment = 'sender-message';
+                } else {
+                    messageAlignment = 'receiver-message';
+                }
+            } else {
+                if (message.fromAdmin) {
+                    messageAlignment = 'receiver-message';
+                } else {
+                    messageAlignment = 'sender-message';
+                }
+            }
+
+            newMessageHtml = `
+            <div class="${messageAlignment}">
+                <strong>${message.fromAdmin ? 'Admin' : 'Staff'}:</strong> ${message.content}
+                <span class="text-muted" style="font-size:small;">${formattedDate}</span>
+            </div>`;
+
+            $('.chat-box').append(newMessageHtml);
+
+            $('.chat-box').scrollTop($('.chat-box')[0].scrollHeight);
         }
 
         // async function loadMessages(travelId) {

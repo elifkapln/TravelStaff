@@ -16,8 +16,6 @@ namespace TravelStaffAPI.Controllers
     {
         private readonly ITravelService _travelService;
         private readonly IMapper _mapper;
-
-
         public TravelController(ITravelService travelService, IMapper mapper)
         {
             _travelService = travelService;
@@ -41,9 +39,9 @@ namespace TravelStaffAPI.Controllers
         }
 
         [HttpGet("gettravelbyadmin/{id}")]
-        public IActionResult GetTravelByAdmin(int id)
+        public async Task<IActionResult> GetTravelByAdmin(int id)
         {
-            var travel = _mapper.Map<List<TravelListDto>>(_travelService.TGetTravelByAdmin(id));
+            var travel = _mapper.Map<List<TravelListDto>>(await _travelService.TGetTravelByAdmin(id));
             return Ok(travel);
         }
 
@@ -58,10 +56,13 @@ namespace TravelStaffAPI.Controllers
                   EndDate = travel.EndDate, 
                   Description = travel.Description, 
                   Stay = travel.Stay, 
-                  Vehicle = travel.Vehicle, 
-                  //StaffID = travel.StaffID, 
-                  //AdminID = travel.AdminID, 
-                  //StatusID = travel.StatusID, 
+                  Vehicle = travel.Vehicle,
+                  //StaffID = travel.StaffID,
+                  //AdminID = travel.AdminID,
+                  //StatusID = travel.StatusID,
+                  //Active = true,
+                  //CreateDate = DateTime.Now,
+
                 });
                 return StatusCode(StatusCodes.Status201Created);
             }
@@ -76,9 +77,10 @@ namespace TravelStaffAPI.Controllers
             return StatusCode(StatusCodes.Status200OK);
         }
 
-        [HttpDelete("delete")]
-        public IActionResult Delete(Travel travel)
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
+            var travel = await _travelService.TGetById(id);
             _travelService.TDelete(travel);
             return StatusCode(StatusCodes.Status200OK);
         }
