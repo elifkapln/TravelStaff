@@ -25,8 +25,7 @@ namespace TravelStaff.Controllers
 		public IActionResult SignUp()
 		{
 			//tüm adminleri al
-			var users = _staffService.TGetAll();
-			var admins = _staffService.TGetAllAdmins(users);
+			var admins = _staffService.TGetAllAdmins();
 
 			//var admins = _userManager.Users
 			//	.Where(x => x.IsAdmin == true)
@@ -82,8 +81,8 @@ namespace TravelStaff.Controllers
 				ModelState.AddModelError("", "Şifre ve Şifre Tekrar uyuşmamaktadır.");
 			}
 
-			var users = _staffService.TGetAll();
-			var adminsList = _staffService.TGetAllAdmins(users);
+			//form yenilenirse diye adminleri tekrar al
+			var adminsList = _staffService.TGetAllAdmins();
 
 			//var adminsList = _userManager.Users
 			//	.Where(x => x.IsAdmin == true)

@@ -10,7 +10,7 @@ namespace BusinessLayer.Abstract
 {
     public interface IStaffService : IGenericService<Staff> 
     {
-		List<Staff> TGetAllAdmins(List<Staff> users);
+		List<Staff> TGetAllAdmins();
 		List<Staff> TGetAllAdminsStaffs(int id);
 
 

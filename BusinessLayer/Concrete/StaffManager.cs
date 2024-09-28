@@ -34,9 +34,9 @@ namespace BusinessLayer.Concrete
 			return _IStaffDal.GetAll();
 		}
 
-		public List<Staff> TGetAllAdmins(List<Staff> users)
+		public List<Staff> TGetAllAdmins()
 		{
-			return _IStaffDal.GetAllAdmins(users);
+			return _IStaffDal.GetAllAdmins();
 		}
 
 		public List<Staff> TGetAllAdminsStaffs(int id)

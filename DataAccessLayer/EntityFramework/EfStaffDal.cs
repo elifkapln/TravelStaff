@@ -20,10 +20,9 @@ namespace DataAccessLayer.EntityFramework
 			this.c = c;
 		}
 
-		public List<Staff> GetAllAdmins(List<Staff> users)
+		public List<Staff> GetAllAdmins()
 		{
-			var values = users.Where(admin => admin.IsAdmin).DefaultIfEmpty().ToList();
-			return values;
+			return c.Staffs.Where(s => s.IsAdmin).ToList();
 		}
 
 		public List<Staff> GetAllAdminsStaffs(int id)

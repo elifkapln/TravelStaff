@@ -9,7 +9,7 @@ namespace DataAccessLayer.Abstract
 {
     public interface IStaffDal : IGenericDal<Staff>
     {
-        List<Staff> GetAllAdmins(List<Staff> users);
+        List<Staff> GetAllAdmins();
         List<Staff> GetAllAdminsStaffs(int id);
     }
 }
