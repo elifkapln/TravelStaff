@@ -55,9 +55,10 @@ namespace TravelStaffAPI.Controllers
             return StatusCode(StatusCodes.Status200OK);
         }
 
-        [HttpDelete("delete")]
-        public IActionResult Delete(Status status)
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(int id)
         {
+            var status = await _IStatusService.TGetById(id);
             _IStatusService.TDelete(status);
             return StatusCode(StatusCodes.Status200OK);
         }
